@@ -122,28 +122,33 @@ export default function TransactionForm({
   }
 
   async function ensureTableExists(supabase, tableName) {
-    const { data, error } = await supabase.rpc("table_exists", {
-      table_name: tableName,
-    });
-
-    if (error) {
-      console.error("Error checking if table exists:", error);
-      return false;
-    }
-
-    if (!data) {
-      // Table doesn't exist, create it
-      const { error: createError } = await supabase.rpc(
-        "create_monthly_table",
-        { table_name: tableName }
-      );
-      if (createError) {
-        console.error("Error creating table:", createError);
+    try {
+      // Attempt to select from the table
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*')
+        .limit(1);
+  
+      if (error && error.code === '42P01') {
+        // Table doesn't exist, create it
+        const { error: createError } = await supabase.rpc(
+          "create_monthly_table",
+          { table_name: tableName }
+        );
+        if (createError) {
+          console.error("Error creating table:", createError);
+          return false;
+        }
+      } else if (error) {
+        console.error("Error checking if table exists:", error);
         return false;
       }
+  
+      return true;
+    } catch (error) {
+      console.error("Error in ensureTableExists:", error);
+      return false;
     }
-
-    return true;
   }
 
   const handleTelegramSubmit = async () => {
