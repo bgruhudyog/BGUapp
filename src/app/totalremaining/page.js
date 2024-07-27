@@ -79,7 +79,7 @@ export default function TotalRemainingPage() {
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h6" gutterBottom align="center" sx={{ mb: 3 }}>
-        Total Remaining by Route
+        कुल उधारी रूट अनुसार
       </Typography>
       <Box mb={2} sx={{ mx: 2 }}>
         <Select
@@ -105,11 +105,12 @@ export default function TotalRemainingPage() {
               <TableRow>
                 <TableCell>दुकान का नाम</TableCell>
                 <TableCell align="right">कुल उधारी</TableCell>
+                <TableCell align="right">कॉल करें</TableCell>
                 <TableCell align="right">कुल माल लिया</TableCell>
                 <TableCell align="right">कुल बिक्री मूल्य</TableCell>
                 <TableCell align="right">नदगी</TableCell>
                 <TableCell align="right">उधारी जमा</TableCell>
-                <TableCell align="right">कॉल करें</TableCell>
+                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -144,6 +145,17 @@ export default function TotalRemainingPage() {
                     <TableCell align="right">
                       ₹{totalRemaining.toFixed(2)}
                     </TableCell>
+                     <TableCell align="right">
+                      {shop.mob_number && (
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleCall(shop.mob_number)}
+                          aria-label={`Call ${shop.shop_name}`}
+                        >
+                          <PhoneIcon />
+                        </IconButton>
+                      )}
+                    </TableCell>
                     <TableCell align="right">
                       {shop.total_quantity?.toFixed(2) || "0.00"} Kg
                     </TableCell>
@@ -156,17 +168,7 @@ export default function TotalRemainingPage() {
                     <TableCell align="right">
                       ₹{shop.total_old?.toFixed(2) || "0.00"}
                     </TableCell>
-                    <TableCell align="right">
-                      {shop.mob_number && (
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleCall(shop.mob_number)}
-                          aria-label={`Call ${shop.shop_name}`}
-                        >
-                          <PhoneIcon />
-                        </IconButton>
-                      )}
-                    </TableCell>
+                    
                   </TableRow>
                 );
               })}
