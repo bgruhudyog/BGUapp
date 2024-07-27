@@ -1,4 +1,4 @@
-import TotalRemaining from './totalremaining';
+import TotalRemaining from '/totalremaining';
 
 export default function TotalRemainingPage() {
   return <TotalRemaining />;
