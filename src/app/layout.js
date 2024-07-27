@@ -218,6 +218,7 @@ export default function RootLayout({ children }) {
       icon: <CurrencyRupeeIcon />,
       path: "/totalremaining",
     },
+    {text: "दैनिक खर्च ",icon: <CurrencyRupeeIcon />,path:"/expenses"}
   ];
 
   const drawer = (
