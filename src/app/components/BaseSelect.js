@@ -148,14 +148,8 @@ import supabaseClient from '../../utils/supabaseClient';
 export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) {
   const [routes, setRoutes] = useState([]);
   const [villages, setVillages] = useState([]);
-  const [selectedRouteId, setSelectedRouteId] = useState(() => {
-    // Initialize from localStorage or null if not present
-    return localStorage.getItem('selectedRouteId') || null;
-  });
-  const [selectedVillageId, setSelectedVillageId] = useState(() => {
-    // Initialize from localStorage or null if not present
-    return localStorage.getItem('selectedVillageId') || null;
-  });
+  const [selectedRouteId, setSelectedRouteId] = useState(null);
+  const [selectedVillageId, setSelectedVillageId] = useState(null);
   const [newRouteName, setNewRouteName] = useState('');
   const [newVillageName, setNewVillageName] = useState('');
   const [addingRoute, setAddingRoute] = useState(false);
@@ -164,20 +158,19 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
 
   useEffect(() => {
     fetchRoutes();
+    // Load saved values from localStorage
+    const savedRouteId = localStorage.getItem('selectedRouteId');
+    const savedVillageId = localStorage.getItem('selectedVillageId');
+    if (savedRouteId) {
+      setSelectedRouteId(savedRouteId);
+      setRouteId(savedRouteId);
+      fetchVillages(savedRouteId);
+    }
+    if (savedVillageId) {
+      setSelectedVillageId(savedVillageId);
+      fetchShops(savedVillageId);
+    }
   }, []);
-
-  useEffect(() => {
-    if (selectedRouteId) {
-      fetchVillages(selectedRouteId);
-      setRouteId(selectedRouteId);
-    }
-  }, [selectedRouteId]);
-
-  useEffect(() => {
-    if (selectedVillageId) {
-      fetchShops(selectedVillageId);
-    }
-  }, [selectedVillageId]);
 
   const fetchRoutes = async () => {
     const { data, error } = await supabaseClient.from('Routes Table').select('*');
@@ -202,6 +195,7 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
     setSelectedRouteId(routeId);
     localStorage.setItem('selectedRouteId', routeId);
     setRouteId(routeId);
+    fetchVillages(routeId);
     setSelectedVillageId(null);
     localStorage.removeItem('selectedVillageId');
   };
@@ -213,6 +207,7 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
     const selectedVillage = villages.find(village => village.id === villageId);
     const villageName = selectedVillage ? selectedVillage.village_name : '';
     setVillageInfo({ villageId, villageName });
+    fetchShops(villageId);
   };
 
   const addRoute = async () => {
