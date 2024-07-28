@@ -349,7 +349,7 @@ export default function RootLayout({ children }) {
               color: theme.palette.mode === "dark" ? "white" : "black",
               background:
                 theme.palette.mode === "dark"
-                  ? "linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9))"
+                  ? "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0))"
                   : "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0))",
               backdropFilter: "blur(10px)",
               WebkitBackdropFilter: "blur(10px)",
