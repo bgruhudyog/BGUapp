@@ -33,6 +33,7 @@ export default function TransactionForm({
   total,
   remaining,
   handleSubmit,
+  onTransactionComplete,
 }) {
   const [isRateFocused, setIsRateFocused] = useState(false);
   const [isCashFocused, setIsCashFocused] = useState(false);
@@ -225,7 +226,7 @@ export default function TransactionForm({
           total: newTotal,
           total_cash: newTotalCash,
           total_old: newTotalOld,
-          
+
           village_name: villageName,
         })
         .eq("id", shopId);
@@ -277,6 +278,12 @@ export default function TransactionForm({
       setSnackbarMessage("हिसाब सफलतापूर्वक जमा किया गया!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true); // Show the Snackbar
+      // Call the onTransactionComplete prop
+      if (onTransactionComplete) {
+        console.log("Calling onTransactionComplete");
+        onTransactionComplete();
+      }
+
       setTimeout(() => {
         resetForm(); // Reset the form after a brief delay
       }, 1000);
