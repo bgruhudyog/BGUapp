@@ -1,12 +1,10 @@
-
-
 "use client";
 import { Autocomplete, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import supabaseClient from "../../utils/supabaseClient";
 import TransactionForm from "./TransactionForm";
-
+import Grid from '@mui/material/Grid';
 export default function ShopSelect({
   shops,
   villageId,
@@ -255,25 +253,34 @@ export default function ShopSelect({
             }}
             fullWidth
           />
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={2}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setShowForm(true)}
-              disabled={!villageId}
-            >
-              नई दुकान जोड़े
-            </Button>
-            {calculatedResult !== null && (
-             <Typography variant="h6" sx={{color: "red"}}>
-                कुल उधारी : ₹{calculatedResult.toFixed(2)}
-              </Typography>
-            )}
+          <Box mt={2}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={4} sm="auto">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setShowForm(true)}
+                  disabled={!villageId}
+                  fullWidth
+                >
+                  नई दुकान जोड़े
+                </Button>
+              </Grid>
+              <Grid item xs={8} sm="auto">
+                {calculatedResult !== null && (
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "red",
+                      textAlign: { xs: "center", sm: "left" },
+                      mt: { xs: 1, sm: 0 },
+                    }}
+                  >
+                    कुल उधारी : ₹{calculatedResult.toFixed(2)}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
           </Box>
         </>
       )}
