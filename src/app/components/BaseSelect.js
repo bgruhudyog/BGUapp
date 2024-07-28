@@ -18,21 +18,24 @@ export default function BaseSelection({
   setRouteId,
   setVillageInfo,
 }) {
+  const isBrowser = typeof window !== "undefined";
+
   const [routes, setRoutes] = useState([]);
   const [villages, setVillages] = useState([]);
-  const [selectedRouteId, setSelectedRouteId] = useState(() => {
-    // Initialize from localStorage or null if not present
-    return localStorage.getItem("selectedRouteId") || null;
-  });
-  const [selectedVillageId, setSelectedVillageId] = useState(() => {
-    // Initialize from localStorage or null if not present
-    return localStorage.getItem("selectedVillageId") || null;
-  });
+  const [selectedRouteId, setSelectedRouteId] = useState(null);
+  const [selectedVillageId, setSelectedVillageId] = useState(null);
   const [newRouteName, setNewRouteName] = useState("");
   const [newVillageName, setNewVillageName] = useState("");
   const [addingRoute, setAddingRoute] = useState(false);
   const [addingVillage, setAddingVillage] = useState(false);
   const newrouteButton = false;
+
+  useEffect(() => {
+    if (isBrowser) {
+      setSelectedRouteId(localStorage.getItem("selectedRouteId") || null);
+      setSelectedVillageId(localStorage.getItem("selectedVillageId") || null);
+    }
+  }, []);
 
   useEffect(() => {
     fetchRoutes();
@@ -57,7 +60,6 @@ export default function BaseSelection({
       .select("*");
     if (error) console.error("Error fetching routes:", error);
     else {
-      // Sort routes by id in ascending order
       const sortedRoutes = data.sort((a, b) => a.id - b.id);
       setRoutes(sortedRoutes);
     }
@@ -84,16 +86,20 @@ export default function BaseSelection({
   const handleRouteChange = (event) => {
     const routeId = event.target.value;
     setSelectedRouteId(routeId);
-    localStorage.setItem("selectedRouteId", routeId);
+    if (isBrowser) {
+      localStorage.setItem("selectedRouteId", routeId);
+      localStorage.removeItem("selectedVillageId");
+    }
     setRouteId(routeId);
     setSelectedVillageId(null);
-    localStorage.removeItem("selectedVillageId");
   };
 
   const handleVillageChange = (event) => {
     const villageId = event.target.value;
     setSelectedVillageId(villageId);
-    localStorage.setItem("selectedVillageId", villageId);
+    if (isBrowser) {
+      localStorage.setItem("selectedVillageId", villageId);
+    }
     const selectedVillage = villages.find(
       (village) => village.id === villageId
     );
