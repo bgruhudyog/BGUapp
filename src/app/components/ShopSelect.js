@@ -270,8 +270,8 @@ export default function ShopSelect({
               नई दुकान जोड़े
             </Button>
             {calculatedResult !== null && (
-              <Typography variant="h6">
-                बकाया: ₹{calculatedResult.toFixed(2)}
+             <Typography variant="h6" sx={{color: "red"}}>
+                कुल उधारी : ₹{calculatedResult.toFixed(2)}
               </Typography>
             )}
           </Box>
