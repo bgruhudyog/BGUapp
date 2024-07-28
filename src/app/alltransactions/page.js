@@ -128,48 +128,61 @@ export default function AllTransactions() {
     setDeleteId(id);
     setOpenDialog(true);
   };
-  
-  
 
   const handleDeleteTransaction = async (transactionId) => {
     try {
       const dateObj = selectedDate;
       const monthNames = [
-        "january", "february", "march", "april", "may", "june", "july",
-        "august", "september", "october", "november", "december"
+        "january",
+        "february",
+        "march",
+        "april",
+        "may",
+        "june",
+        "july",
+        "august",
+        "september",
+        "october",
+        "november",
+        "december",
       ];
       const monthName = monthNames[dateObj.getMonth()];
       const year = dateObj.getFullYear();
       const tableName = `daily_transactions_${monthName}_${year}`;
-  
+
       // Fetch the transaction details
-      const { data: transactionData, error: fetchTransactionError } = await supabase
-        .from(tableName)
-        .select('*')
-        .eq('id', transactionId)
-        .single();
-  
+      const { data: transactionData, error: fetchTransactionError } =
+        await supabase
+          .from(tableName)
+          .select("*")
+          .eq("id", transactionId)
+          .single();
+
       if (fetchTransactionError) {
-        throw new Error(`Error fetching transaction: ${fetchTransactionError.message}`);
+        throw new Error(
+          `Error fetching transaction: ${fetchTransactionError.message}`
+        );
       }
-  
+
       // Fetch current shop data
       const { data: shopData, error: fetchShopError } = await supabase
         .from("Shops Table")
         .select("*")
         .eq("id", transactionData.shop_id)
         .single();
-  
+
       if (fetchShopError) {
         throw new Error(`Failed to fetch shop data: ${fetchShopError.message}`);
       }
-  
+
       // Calculate new totals
-      const newTotalQuantity = (shopData.total_quantity || 0) - (parseFloat(transactionData.quantity) || 0);
+      const newTotalQuantity =
+        (shopData.total_quantity || 0) -
+        (parseFloat(transactionData.quantity) || 0);
       const newTotal = (shopData.total || 0) - transactionData.total;
       const newTotalCash = (shopData.total_cash || 0) - transactionData.cash;
       const newTotalOld = (shopData.total_old || 0) - transactionData.old;
-  
+
       // Update Shops Table
       const { error: updateShopError } = await supabase
         .from("Shops Table")
@@ -180,23 +193,27 @@ export default function AllTransactions() {
           total_old: newTotalOld,
         })
         .eq("id", transactionData.shop_id);
-  
+
       if (updateShopError) {
-        throw new Error(`Failed to update shop totals: ${updateShopError.message}`);
+        throw new Error(
+          `Failed to update shop totals: ${updateShopError.message}`
+        );
       }
-  
+
       // Delete the transaction
       const { error: deleteError } = await supabase
         .from(tableName)
         .delete()
         .eq("id", transactionId);
-  
+
       if (deleteError) {
         throw new Error(`Error deleting transaction: ${deleteError.message}`);
       }
-  
+
       // If everything is successful
-      setSnackbarMessage("Transaction deleted and shop data updated successfully.");
+      setSnackbarMessage(
+        "Transaction deleted and shop data updated successfully."
+      );
       setSnackbarSeverity("success");
       // Fetch transactions for the currently selected date
       fetchTransactions(selectedDate);
@@ -213,8 +230,6 @@ export default function AllTransactions() {
   const confirmDelete = () => {
     handleDeleteTransaction(deleteId);
   };
-
-
 
   const sendTotalToTelegram = async () => {
     const telegramToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
@@ -264,6 +279,7 @@ export default function AllTransactions() {
     setOpenSnackbar(false);
   };
 
+  const reversedTransactions = [...transactions].reverse();
   return (
     <Container sx={{ mt: 4, mb: 6 }}>
       {/* ... (keep all other JSX as it is) */}
@@ -362,7 +378,7 @@ export default function AllTransactions() {
       </Box>
 
       <Grid container spacing={3} sx={{ mt: 1 }}>
-        {transactions.map((transaction) => (
+        {reversedTransactions.map((transaction) => (
           <Grid item xs={12} sm={6} md={4} key={transaction.id}>
             <Card
               sx={{
