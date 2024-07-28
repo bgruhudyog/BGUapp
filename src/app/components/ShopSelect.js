@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import supabaseClient from "../../utils/supabaseClient";
 import TransactionForm from "./TransactionForm";
-import Grid from '@mui/material/Grid';
+import Grid from "@mui/material/Grid";
 export default function ShopSelect({
   shops,
   villageId,
@@ -180,6 +180,19 @@ export default function ShopSelect({
   const sortedShops = [...shops].sort((a, b) =>
     a.shop_name.localeCompare(b.shop_name)
   );
+  const capitalizeFirstLetters = (text) => {
+    return text
+      .split(" ")
+      .map((word, index) =>
+        index < 2 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+      )
+      .join(" ");
+  };
+  const handleChange = (e) => {
+    const inputValue = e.target.value;
+    const capitalizedValue = capitalizeFirstLetters(inputValue);
+    setNewShopName(capitalizedValue);
+  };
 
   return (
     <Box mb={2} mt={2}>
@@ -188,7 +201,7 @@ export default function ShopSelect({
           <TextField
             label="नई दुकान का नाम लिखे"
             value={newShopName}
-            onChange={(e) => setNewShopName(e.target.value)}
+            onChange={handleChange}
             fullWidth
             margin="normal"
             required
@@ -260,7 +273,7 @@ export default function ShopSelect({
                   variant="contained"
                   color="primary"
                   onClick={() => setShowForm(true)}
-                  disabled={!villageId}
+                  // disabled={!villageId}
                   fullWidth
                 >
                   नई दुकान जोड़े
