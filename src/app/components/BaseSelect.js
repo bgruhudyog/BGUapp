@@ -1,41 +1,61 @@
-
-
 "use client";
 
-import { useEffect, useState } from 'react';
-import { Box, Select, MenuItem, InputLabel, FormControl, Button, TextField, Typography } from '@mui/material';
-import supabaseClient from '../../utils/supabaseClient';
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Button,
+  TextField,
+  Typography,
+} from "@mui/material";
+import supabaseClient from "../../utils/supabaseClient";
 
-export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) {
+export default function BaseSelection({
+  setShops,
+  setRouteId,
+  setVillageInfo,
+}) {
   const [routes, setRoutes] = useState([]);
   const [villages, setVillages] = useState([]);
-  const [selectedRouteId, setSelectedRouteId] = useState(null);
-  const [selectedVillageId, setSelectedVillageId] = useState(null);
-  const [newRouteName, setNewRouteName] = useState('');
-  const [newVillageName, setNewVillageName] = useState('');
+  const [selectedRouteId, setSelectedRouteId] = useState(() => {
+    // Initialize from localStorage or null if not present
+    return localStorage.getItem("selectedRouteId") || null;
+  });
+  const [selectedVillageId, setSelectedVillageId] = useState(() => {
+    // Initialize from localStorage or null if not present
+    return localStorage.getItem("selectedVillageId") || null;
+  });
+  const [newRouteName, setNewRouteName] = useState("");
+  const [newVillageName, setNewVillageName] = useState("");
   const [addingRoute, setAddingRoute] = useState(false);
   const [addingVillage, setAddingVillage] = useState(false);
   const newrouteButton = false;
 
   useEffect(() => {
     fetchRoutes();
-    // Load saved values from localStorage
-    const savedRouteId = localStorage.getItem('selectedRouteId');
-    const savedVillageId = localStorage.getItem('selectedVillageId');
-    if (savedRouteId) {
-      setSelectedRouteId(savedRouteId);
-      setRouteId(savedRouteId);
-      fetchVillages(savedRouteId);
-    }
-    if (savedVillageId) {
-      setSelectedVillageId(savedVillageId);
-      fetchShops(savedVillageId);
-    }
   }, []);
 
+  useEffect(() => {
+    if (selectedRouteId) {
+      fetchVillages(selectedRouteId);
+      setRouteId(selectedRouteId);
+    }
+  }, [selectedRouteId]);
+
+  useEffect(() => {
+    if (selectedVillageId) {
+      fetchShops(selectedVillageId);
+    }
+  }, [selectedVillageId]);
+
   const fetchRoutes = async () => {
-    const { data, error } = await supabaseClient.from('Routes Table').select('*');
-    if (error) console.error('Error fetching routes:', error);
+    const { data, error } = await supabaseClient
+      .from("Routes Table")
+      .select("*");
+    if (error) console.error("Error fetching routes:", error);
     else {
       // Sort routes by id in ascending order
       const sortedRoutes = data.sort((a, b) => a.id - b.id);
@@ -44,58 +64,70 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
   };
 
   const fetchVillages = async (routeId) => {
-    const { data, error } = await supabaseClient.from('Villages Table').select('*').eq('route_id', routeId);
-    if (error) console.error('Error fetching villages:', error);
+    const { data, error } = await supabaseClient
+      .from("Villages Table")
+      .select("*")
+      .eq("route_id", routeId);
+    if (error) console.error("Error fetching villages:", error);
     else setVillages(data);
   };
 
   const fetchShops = async (villageId) => {
-    const { data, error } = await supabaseClient.from('Shops Table').select('*').eq('village_id', villageId);
-    if (error) console.error('Error fetching shops:', error);
+    const { data, error } = await supabaseClient
+      .from("Shops Table")
+      .select("*")
+      .eq("village_id", villageId);
+    if (error) console.error("Error fetching shops:", error);
     else setShops(data);
   };
 
   const handleRouteChange = (event) => {
     const routeId = event.target.value;
     setSelectedRouteId(routeId);
-    localStorage.setItem('selectedRouteId', routeId);
+    localStorage.setItem("selectedRouteId", routeId);
     setRouteId(routeId);
-    fetchVillages(routeId);
     setSelectedVillageId(null);
-    localStorage.removeItem('selectedVillageId');
+    localStorage.removeItem("selectedVillageId");
   };
 
   const handleVillageChange = (event) => {
     const villageId = event.target.value;
     setSelectedVillageId(villageId);
-    localStorage.setItem('selectedVillageId', villageId);
-    const selectedVillage = villages.find(village => village.id === villageId);
-    const villageName = selectedVillage ? selectedVillage.village_name : '';
+    localStorage.setItem("selectedVillageId", villageId);
+    const selectedVillage = villages.find(
+      (village) => village.id === villageId
+    );
+    const villageName = selectedVillage ? selectedVillage.village_name : "";
     setVillageInfo({ villageId, villageName });
-    fetchShops(villageId);
   };
 
   const addRoute = async () => {
-    const { data, error } = await supabaseClient.from('Routes Table').insert([{ route_name: newRouteName }]);
-    if (error) console.error('Error adding route:', error);
+    const { data, error } = await supabaseClient
+      .from("Routes Table")
+      .insert([{ route_name: newRouteName }]);
+    if (error) console.error("Error adding route:", error);
     else fetchRoutes();
-    setNewRouteName('');
+    setNewRouteName("");
     setAddingRoute(false);
   };
 
   const addVillage = async () => {
-    const { data, error } = await supabaseClient.from('Villages Table').insert([{ village_name: newVillageName, route_id: selectedRouteId }]);
-    if (error) console.error('Error adding village:', error);
+    const { data, error } = await supabaseClient
+      .from("Villages Table")
+      .insert([{ village_name: newVillageName, route_id: selectedRouteId }]);
+    if (error) console.error("Error adding village:", error);
     else {
       fetchVillages(selectedRouteId);
     }
-    setNewVillageName('');
+    setNewVillageName("");
     setAddingVillage(false);
   };
 
   return (
     <Box mb={4}>
-      <Typography variant="h6" gutterBottom>रूट और गाँव चुनें</Typography>
+      <Typography variant="h6" gutterBottom>
+        रूट और गाँव चुनें
+      </Typography>
       <Box mb={2}>
         {addingRoute ? (
           <>
@@ -106,21 +138,32 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
               fullWidth
               margin="normal"
             />
-            <Button variant="contained" color="primary" onClick={addRoute} disabled={!newRouteName}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addRoute}
+              disabled={!newRouteName}
+            >
               रूट जमा करे
             </Button>
-            <Button variant="outlined" color="secondary" onClick={() => setAddingRoute(false)} style={{ marginLeft: 8 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setAddingRoute(false)}
+              style={{ marginLeft: 8 }}
+            >
               रद्द करे
             </Button>
           </>
         ) : (
           <>
-            <FormControl fullWidth margin="normal">
+            <FormControl fullWidth margin="normal" variant="outlined">
               <InputLabel id="route-select-label">रूट चुने</InputLabel>
-              <Select 
-                labelId="route-select-label" 
+              <Select
+                labelId="route-select-label"
+                label="रूट चुने"
                 onChange={handleRouteChange}
-                value={selectedRouteId || ''}
+                value={selectedRouteId || ""}
               >
                 {routes.map((route) => (
                   <MenuItem key={route.id} value={route.id}>
@@ -129,7 +172,13 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
                 ))}
               </Select>
             </FormControl>
-            <Button variant="contained" color="primary" onClick={() => setAddingRoute(true)} disabled={true} style={{ marginTop: 8 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setAddingRoute(true)}
+              disabled={true}
+              style={{ marginTop: 8 }}
+            >
               नया रूट जोड़े
             </Button>
           </>
@@ -145,21 +194,34 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
               fullWidth
               margin="normal"
             />
-            <Button variant="contained" color="primary" onClick={addVillage} disabled={!newVillageName || !selectedRouteId}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addVillage}
+              disabled={!newVillageName || !selectedRouteId}
+            >
               गाँव जमा करे
             </Button>
-            <Button variant="outlined" color="secondary" onClick={() => setAddingVillage(false)} style={{ marginLeft: 8 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setAddingVillage(false)}
+              style={{ marginLeft: 8 }}
+            >
               रद्द करे
             </Button>
           </>
         ) : (
           <>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="village-select-label">गाँव या शहर का नाम चुनें</InputLabel>
-              <Select 
-                labelId="village-select-label" 
+            <FormControl fullWidth margin="normal" variant="outlined">
+              <InputLabel id="village-select-label">
+                गाँव या शहर का नाम चुनें
+              </InputLabel>
+              <Select
+                labelId="village-select-label"
+                label="गाँव या शहर का नाम चुनें"
                 onChange={handleVillageChange}
-                value={selectedVillageId || ''}
+                value={selectedVillageId || ""}
               >
                 {villages.map((village) => (
                   <MenuItem key={village.id} value={village.id}>
@@ -168,7 +230,13 @@ export default function BaseSelection({ setShops, setRouteId, setVillageInfo }) 
                 ))}
               </Select>
             </FormControl>
-            <Button variant="contained" color="primary" onClick={() => setAddingVillage(true)} style={{ marginTop: 8 }} disabled={!selectedRouteId}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setAddingVillage(true)}
+              style={{ marginTop: 8 }}
+              disabled={!selectedRouteId}
+            >
               नया गाँव या शहर जोड़े
             </Button>
           </>
