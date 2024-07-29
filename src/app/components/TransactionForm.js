@@ -34,7 +34,8 @@ export default function TransactionForm({
   remaining,
   handleSubmit,
   onTransactionComplete,
-  mobileNumber
+  mobileNumber,
+  quantityInputRef
 }) {
   const [isRateFocused, setIsRateFocused] = useState(false);
   const [isCashFocused, setIsCashFocused] = useState(false);
@@ -53,10 +54,12 @@ export default function TransactionForm({
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const isFormValid =
-    ((quantity !== "" && parseFloat(quantity) !== 0) && (mobileNumber === null || /^[0-9]{10}$/.test(mobileNumber))) ||
-    ((old !== "" && parseFloat(old) !== 0) &&
-    (mobileNumber === null || /^[0-9]{10}$/.test(mobileNumber)));
-
+    (quantity !== "" &&
+      parseFloat(quantity) !== 0 &&
+      (mobileNumber === null || /^[0-9]{10}$/.test(mobileNumber))) ||
+    (old !== "" &&
+      parseFloat(old) !== 0 &&
+      (mobileNumber === null || /^[0-9]{10}$/.test(mobileNumber)));
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
@@ -195,7 +198,6 @@ export default function TransactionForm({
         old: oldValue,
         remaining: remainingValue,
         shop_id: shopId,
-
       };
 
       const { data, error } = await insertTransaction(transactionData);
@@ -232,7 +234,7 @@ export default function TransactionForm({
           total_old: newTotalOld,
 
           village_name: villageName,
-          mob_number: mobileNumber
+          mob_number: mobileNumber,
         })
         .eq("id", shopId);
 
@@ -319,7 +321,9 @@ export default function TransactionForm({
           }}
           fullWidth
           margin="normal"
+          inputRef={quantityInputRef} // Add this line
         />
+        
         <TextField
           id="rate"
           label="रेट"
