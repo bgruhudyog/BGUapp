@@ -210,7 +210,7 @@ export default function ShopSelect({
           <TextField
             label="नई दुकान का नाम लिखे"
             value={newShopName}
-            onChange={(e) => setNewShopName(e.target.value)}
+            onChange={(e) => handleChange(e)}
             fullWidth
             margin="normal"
             required
