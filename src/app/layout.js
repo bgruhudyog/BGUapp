@@ -374,7 +374,7 @@ export default function RootLayout({ children }) {
                 onClick={handleLogoClick}
               >
                 <Image
-                  src="/logo.jpg"
+                  src="/logo.png"
                   alt="Balaji Gruh Udyog Logo"
                   width={40}
                   height={40}
