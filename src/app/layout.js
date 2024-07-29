@@ -374,11 +374,11 @@ export default function RootLayout({ children }) {
                 onClick={handleLogoClick}
               >
                 <Image
-                  src="/logo.png"
+                  src="/logo.jpg"
                   alt="Balaji Gruh Udyog Logo"
                   width={40}
                   height={40}
-                  style={{ borderRadius: "20%" }}
+                  style={{ borderRadius: "20%",background:"linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0))" }}
                 />
                 <Box
                   sx={{
