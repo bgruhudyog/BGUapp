@@ -26,6 +26,10 @@ export default function ShopSelect({
   const [remaining, setRemaining] = useState(0);
   const [calculatedResult, setCalculatedResult] = useState(null);
 
+  const isValidMobileNumber = (number) => {
+    return number === "" || (number.length === 10 && /^\d+$/.test(number));
+  };
+
   useEffect(() => {
     setSelectedShopId("");
     setSelectedShopName("");
@@ -48,6 +52,11 @@ export default function ShopSelect({
   };
 
   const addShop = async () => {
+    if (newShopMobile && !isValidMobileNumber(newShopMobile)) {
+      alert("मोबाइल नंबर 10 अंकों का होना चाहिए");
+      return;
+    }
+
     const mobileNumber = newShopMobile ? parseInt(newShopMobile, 10) : null;
 
     const newShopData = {
@@ -201,7 +210,7 @@ export default function ShopSelect({
           <TextField
             label="नई दुकान का नाम लिखे"
             value={newShopName}
-            onChange={handleChange}
+            onChange={(e) => setNewShopName(e.target.value)}
             fullWidth
             margin="normal"
             required
@@ -210,7 +219,7 @@ export default function ShopSelect({
             label="मोबाइल नंबर "
             value={newShopMobile}
             onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "");
+              const value = e.target.value.replace(/\D/g, "").slice(0, 10);
               setNewShopMobile(value);
             }}
             fullWidth
@@ -222,7 +231,7 @@ export default function ShopSelect({
             variant="contained"
             color="primary"
             onClick={addShop}
-            disabled={!newShopName || !villageId}
+            disabled={!newShopName || (newShopMobile && !isValidMobileNumber(newShopMobile))}
           >
             दुकान जोड़े
           </Button>
