@@ -218,10 +218,10 @@ export default function ShopSelect({
       // Check if mob_number is null
       if (newValue.mob_number === null) {
         setShowMobileInput(true);
-        setMobileNumber("");
+        // setMobileNumber(null);
       } else {
         setShowMobileInput(false);
-        setMobileNumber(newValue.mob_number.toString());
+        // setMobileNumber(newValue.mob_number.toString());
       }
 
       setTimeout(() => {
@@ -366,6 +366,7 @@ export default function ShopSelect({
           remaining={remaining}
           handleSubmit={handleSubmit}
           onTransactionComplete={updateShopData}
+          setMobileNumber={setMobileNumber}
           mobileNumber={mobileNumber}
           quantityInputRef={quantityInputRef} // Add this line
         />

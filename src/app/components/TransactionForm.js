@@ -34,6 +34,7 @@ export default function TransactionForm({
   remaining,
   handleSubmit,
   onTransactionComplete,
+  setMobileNumber,
   mobileNumber,
   quantityInputRef
 }) {
@@ -241,6 +242,8 @@ export default function TransactionForm({
       if (updateError) {
         throw new Error(`Failed to update shop totals: ${updateError.message}`);
       }
+
+      setMobileNumber(null);
 
       let message;
       if (totalValue === 0) {
