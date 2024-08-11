@@ -27,6 +27,7 @@ export default function ShopSelect({
   const [calculatedResult, setCalculatedResult] = useState(null);
   const [mobileNumber, setMobileNumber] = useState(null);
   const [showMobileInput, setShowMobileInput] = useState(true);
+  const [originalMobileNumber, setOriginalMobileNumber] = useState(null);
   const mobileInputRef = useRef(null);
   const quantityInputRef = useRef(null);
 
@@ -207,6 +208,8 @@ export default function ShopSelect({
     setNewShopName(capitalizedValue);
   };
   const handleShopSelect = async (event, newValue) => {
+
+    
     if (newValue) {
       setSelectedShopId(newValue.id);
       setSelectedShopName(newValue.shop_name);
@@ -214,14 +217,16 @@ export default function ShopSelect({
       const result = calculateShopResult(newValue);
       console.log("Initial calculated result:", result);
       setCalculatedResult(result);
-
-      // Check if mob_number is null
+  
+      // Store the original mobile number
+      setOriginalMobileNumber(newValue.mob_number);
+  
       if (newValue.mob_number === null) {
         setShowMobileInput(true);
-        // setMobileNumber(null);
+        setMobileNumber(null);
       } else {
         setShowMobileInput(false);
-        // setMobileNumber(newValue.mob_number.toString());
+        setMobileNumber(newValue.mob_number.toString());
       }
 
       setTimeout(() => {
@@ -229,6 +234,12 @@ export default function ShopSelect({
           top: document.documentElement.scrollHeight,
           behavior: "smooth",
         });
+      // setTimeout(() => {
+      //   const scrollAmount = 50; // Adjust this value to control how much it scrolls
+      //   window.scrollTo({
+      //     top: window.scrollY + scrollAmount,
+      //     behavior: "smooth",
+      //   });
 
         // Focus on the appropriate input field after scrolling
         setTimeout(() => {
@@ -368,6 +379,7 @@ export default function ShopSelect({
           onTransactionComplete={updateShopData}
           setMobileNumber={setMobileNumber}
           mobileNumber={mobileNumber}
+          originalMobileNumber={originalMobileNumber}
           quantityInputRef={quantityInputRef} // Add this line
         />
       )}
