@@ -36,6 +36,7 @@ export default function TransactionForm({
   onTransactionComplete,
   setMobileNumber,
   mobileNumber,
+  originalMobileNumber,
   quantityInputRef
 }) {
   const [isRateFocused, setIsRateFocused] = useState(false);
@@ -159,6 +160,153 @@ export default function TransactionForm({
     }
   }
 
+  // const handleTelegramSubmit = async () => {
+  //   try {
+  //     console.log("handleTelegramSubmit function called");
+  //     console.log(shopId);
+  //     const telegramToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
+  //     const chatId = "-4209186125";
+  //     const telegramURL = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+
+  //     const currentDate = new Date();
+  //     const year = currentDate.getFullYear();
+  //     const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  //     const day = String(currentDate.getDate()).padStart(2, "0");
+
+  //     const formattedDateForSupaBase = `${year}-${month}-${day}`;
+  //     const formattedDateForTelegram = `${day}/${month}/${year}`;
+
+  //     console.log("Preparing to insert data into Supabase");
+  //     console.log("Data to be inserted:", {
+  //       created_at: formattedDateForSupaBase,
+  //       shop_name: shopName,
+  //       village_name: villageName,
+  //       route_id: routeId,
+  //       quantity: parseFloat(quantity) || 0,
+  //       total: totalValue,
+  //       cash: cashValue,
+  //       old: oldValue,
+  //       remaining: remainingValue,
+  //       shop_id: shopId,
+  //     });
+  //     const transactionData = {
+  //       created_at: formattedDateForSupaBase,
+  //       shop_name: shopName,
+  //       village_name: villageName,
+  //       route_id: routeId,
+  //       quantity: parseFloat(quantity) || 0,
+  //       total: totalValue,
+  //       cash: cashValue,
+  //       old: oldValue,
+  //       remaining: remainingValue,
+  //       shop_id: shopId,
+  //     };
+
+  //     const { data, error } = await insertTransaction(transactionData);
+  //     if (error) {
+  //       throw new Error(`Failed to insert transaction: ${error.message}`);
+  //     }
+
+  //     // Fetch current shop data
+  //     const { data: shopData, error: fetchError } = await supabase
+  //       .from("Shops Table")
+  //       .select("*")
+  //       .eq("id", shopId)
+  //       .single();
+
+  //     if (fetchError) {
+  //       throw new Error(`Failed to fetch shop data: ${fetchError.message}`);
+  //     }
+
+  //     // Calculate new totals
+  //     const newTotalQuantity =
+  //       (shopData.total_quantity || 0) + (parseFloat(quantity) || 0);
+  //     const newTotal = (shopData.total || 0) + totalValue;
+  //     const newTotalCash = (shopData.total_cash || 0) + cashValue;
+  //     const newTotalOld = (shopData.total_old || 0) + oldValue;
+
+  //     // Update Shops Table
+  //     const { data: updateData, error: updateError } = await supabase
+  //       .from("Shops Table")
+  //       .update({
+  //         route_id: routeId,
+  //         total_quantity: newTotalQuantity,
+  //         total: newTotal,
+  //         total_cash: newTotalCash,
+  //         total_old: newTotalOld,
+
+  //         village_name: villageName,
+  //         mob_number: mobileNumber,
+  //       })
+  //       .eq("id", shopId);
+
+  //     if (updateError) {
+  //       throw new Error(`Failed to update shop totals: ${updateError.message}`);
+  //     }
+
+  //     setMobileNumber(null);
+
+  //     let message;
+  //     if (totalValue === 0) {
+  //       message = `
+  // दिनांक: ${formattedDateForTelegram}\n
+  // रूट: ${routeId}\n
+  // दुकान का नाम: ${shopName}, ${villageName}\n
+  // पुराने जमा: ₹${oldValue.toFixed(2)}\n
+  //       `;
+  //     } else {
+  //       message = `
+  // दिनांक: ${formattedDateForTelegram}\n
+  // रूट: ${routeId}\n
+  // दुकान का नाम: ${shopName}, ${villageName}\n
+  // मात्रा: ${quantity} Kg\n
+  // रेट: ₹${rateValue}\n
+  // कुल: ₹${totalValue.toFixed(2)}\n
+  // नगदी: ₹${cash}\n
+  // आज के बाक़ी: ₹${remainingValue.toFixed(2)}\n
+  // पुराने जमा: ₹${oldValue.toFixed(2)}\n
+  //           `;
+  //     }
+
+  //     console.log("Sending message to Telegram");
+
+  //     // Send message to Telegram
+  //     const response = await fetch(telegramURL, {
+  //       method: "POST",
+  //       body: JSON.stringify({
+  //         chat_id: chatId,
+  //         text: message,
+  //         parse_mode: "HTML",
+  //       }),
+  //       headers: { "Content-Type": "application/json" },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Telegram API response was not ok.");
+  //     }
+
+  //     console.log("Message sent to Telegram successfully");
+  //     setSnackbarMessage("हिसाब सफलतापूर्वक जमा किया गया!");
+  //     setSnackbarSeverity("success");
+  //     setOpenSnackbar(true); // Show the Snackbar
+  //     // Call the onTransactionComplete prop
+  //     if (onTransactionComplete) {
+  //       console.log("Calling onTransactionComplete");
+  //       onTransactionComplete();
+  //     }
+
+  //     setTimeout(() => {
+  //       resetForm(); // Reset the form after a brief delay
+  //     }, 1000);
+  //   } catch (error) {
+  //     console.error("Error in handleTelegramSubmit:", error.message);
+  //     setSnackbarMessage("Error occurred while submitting. Please try again.");
+  //     setSnackbarSeverity("error");
+  //     // Handle the error appropriately (e.g., show an error message to the user)
+  //     setOpenSnackbar(true);
+  //   }
+  // };
+
   const handleTelegramSubmit = async () => {
     try {
       console.log("handleTelegramSubmit function called");
@@ -166,28 +314,16 @@ export default function TransactionForm({
       const telegramToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
       const chatId = "-4209186125";
       const telegramURL = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
-
+  
       const currentDate = new Date();
       const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
       const day = String(currentDate.getDate()).padStart(2, "0");
-
+  
       const formattedDateForSupaBase = `${year}-${month}-${day}`;
       const formattedDateForTelegram = `${day}/${month}/${year}`;
-
+  
       console.log("Preparing to insert data into Supabase");
-      console.log("Data to be inserted:", {
-        created_at: formattedDateForSupaBase,
-        shop_name: shopName,
-        village_name: villageName,
-        route_id: routeId,
-        quantity: parseFloat(quantity) || 0,
-        total: totalValue,
-        cash: cashValue,
-        old: oldValue,
-        remaining: remainingValue,
-        shop_id: shopId,
-      });
       const transactionData = {
         created_at: formattedDateForSupaBase,
         shop_name: shopName,
@@ -200,30 +336,33 @@ export default function TransactionForm({
         remaining: remainingValue,
         shop_id: shopId,
       };
-
+      console.log("Data to be inserted:", transactionData);
+  
       const { data, error } = await insertTransaction(transactionData);
       if (error) {
         throw new Error(`Failed to insert transaction: ${error.message}`);
       }
-
+  
       // Fetch current shop data
       const { data: shopData, error: fetchError } = await supabase
         .from("Shops Table")
         .select("*")
         .eq("id", shopId)
         .single();
-
+  
       if (fetchError) {
         throw new Error(`Failed to fetch shop data: ${fetchError.message}`);
       }
-
+  
       // Calculate new totals
-      const newTotalQuantity =
-        (shopData.total_quantity || 0) + (parseFloat(quantity) || 0);
+      const newTotalQuantity = (shopData.total_quantity || 0) + (parseFloat(quantity) || 0);
       const newTotal = (shopData.total || 0) + totalValue;
       const newTotalCash = (shopData.total_cash || 0) + cashValue;
       const newTotalOld = (shopData.total_old || 0) + oldValue;
-
+  
+      // Use originalMobileNumber if mobileNumber is null
+      const mobileNumberToUse = mobileNumber || originalMobileNumber;
+  
       // Update Shops Table
       const { data: updateData, error: updateError } = await supabase
         .from("Shops Table")
@@ -233,18 +372,15 @@ export default function TransactionForm({
           total: newTotal,
           total_cash: newTotalCash,
           total_old: newTotalOld,
-
           village_name: villageName,
-          mob_number: mobileNumber,
+          mob_number: mobileNumberToUse,
         })
         .eq("id", shopId);
-
+  
       if (updateError) {
         throw new Error(`Failed to update shop totals: ${updateError.message}`);
       }
-
-      setMobileNumber(null);
-
+  
       let message;
       if (totalValue === 0) {
         message = `
@@ -266,9 +402,9 @@ export default function TransactionForm({
   पुराने जमा: ₹${oldValue.toFixed(2)}\n
             `;
       }
-
+  
       console.log("Sending message to Telegram");
-
+  
       // Send message to Telegram
       const response = await fetch(telegramURL, {
         method: "POST",
@@ -279,29 +415,28 @@ export default function TransactionForm({
         }),
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (!response.ok) {
         throw new Error("Telegram API response was not ok.");
       }
-
+  
       console.log("Message sent to Telegram successfully");
       setSnackbarMessage("हिसाब सफलतापूर्वक जमा किया गया!");
       setSnackbarSeverity("success");
-      setOpenSnackbar(true); // Show the Snackbar
-      // Call the onTransactionComplete prop
+      setOpenSnackbar(true);
+  
       if (onTransactionComplete) {
         console.log("Calling onTransactionComplete");
         onTransactionComplete();
       }
-
+  
       setTimeout(() => {
-        resetForm(); // Reset the form after a brief delay
+        resetForm();
       }, 1000);
     } catch (error) {
       console.error("Error in handleTelegramSubmit:", error.message);
       setSnackbarMessage("Error occurred while submitting. Please try again.");
       setSnackbarSeverity("error");
-      // Handle the error appropriately (e.g., show an error message to the user)
       setOpenSnackbar(true);
     }
   };
