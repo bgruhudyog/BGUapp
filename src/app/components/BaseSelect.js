@@ -29,13 +29,17 @@ export default function BaseSelection({
   const [addingRoute, setAddingRoute] = useState(false);
   const [addingVillage, setAddingVillage] = useState(false);
   const newrouteButton = false;
+  const [selectedVillageName, setSelectedVillageName] = useState("");
 
   useEffect(() => {
     if (isBrowser) {
       setSelectedRouteId(localStorage.getItem("selectedRouteId") || null);
       setSelectedVillageId(localStorage.getItem("selectedVillageId") || null);
+      setSelectedVillageName(localStorage.getItem("selectedVillageName") || "");
     }
   }, []);
+
+console.log(selectedVillageName);
 
   useEffect(() => {
     fetchRoutes();
@@ -95,17 +99,17 @@ export default function BaseSelection({
   };
 
   const handleVillageChange = (event) => {
-    const villageId = event.target.value;
-    setSelectedVillageId(villageId);
-    if (isBrowser) {
-      localStorage.setItem("selectedVillageId", villageId);
-    }
-    const selectedVillage = villages.find(
-      (village) => village.id === villageId
-    );
-    const villageName = selectedVillage ? selectedVillage.village_name : "";
-    setVillageInfo({ villageId, villageName });
-  };
+  const villageId = event.target.value;
+  setSelectedVillageId(villageId);
+  const selectedVillage = villages.find((village) => village.id === villageId);
+  const villageName = selectedVillage ? selectedVillage.village_name : "";
+  setSelectedVillageName(villageName);
+  if (isBrowser) {
+    localStorage.setItem("selectedVillageId", villageId);
+    localStorage.setItem("selectedVillageName", villageName);
+  }
+  setVillageInfo({ villageId, villageName });
+};
 
   const addRoute = async () => {
     const { data, error } = await supabaseClient
