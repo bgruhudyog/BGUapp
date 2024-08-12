@@ -43,10 +43,11 @@ export default function ShopSelect({
   }, [villageId, routeId]);
 
   const fetchShops = async () => {
+    console.log("fetch shops called")
     const { data, error } = await supabaseClient
       .from("Shops Table")
       .select("*")
-      .eq("village_id", villageId);
+      .eq("village_id", localStorage.getItem("selectedVillageName"));
     if (error) {
       console.error("Error fetching shops:", error);
       return null;
@@ -66,7 +67,7 @@ export default function ShopSelect({
 
     const newShopData = {
       shop_name: newShopName,
-      village_id: villageId,
+      village_id: localStorage.getItem("selectedVillageId"),
       route_id: null,
       total_quantity: null,
       total: null,
