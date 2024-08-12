@@ -327,7 +327,7 @@ export default function TransactionForm({
       const transactionData = {
         created_at: formattedDateForSupaBase,
         shop_name: shopName,
-        village_name: villageName,
+        village_name: localStorage.getItem("selectedVillageName") || "",
         route_id: routeId,
         quantity: parseFloat(quantity) || 0,
         total: totalValue,
@@ -372,7 +372,7 @@ export default function TransactionForm({
           total: newTotal,
           total_cash: newTotalCash,
           total_old: newTotalOld,
-          village_name: villageName,
+          village_name: localStorage.getItem("selectedVillageName") || "",
           mob_number: mobileNumberToUse,
         })
         .eq("id", shopId);
