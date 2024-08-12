@@ -47,7 +47,7 @@ export default function ShopSelect({
     const { data, error } = await supabaseClient
       .from("Shops Table")
       .select("*")
-      .eq("village_id", localStorage.getItem("selectedVillageName"));
+      .eq("village_id", localStorage.getItem("selectedVillageId"));
     if (error) {
       console.error("Error fetching shops:", error);
       return null;
