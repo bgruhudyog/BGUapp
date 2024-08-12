@@ -107,6 +107,7 @@ export default function ShopSelect({
           cash,
           old,
           created_at: new Date().toISOString(),
+          village_name: villageName,
         },
       ]);
 
