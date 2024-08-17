@@ -16,10 +16,11 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState({
-    dailyExpense: 200,
+    dailyExpense: 200, // Use number for expense value
     gasExpense: "",
     petrolExpense: "",
     tollTaxExpense: "",
@@ -38,10 +39,10 @@ export default function ExpenseTracker() {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type, checked } = event.target;
     setExpenses((prevExpenses) => ({
       ...prevExpenses,
-      [name]: value,
+      [name]: type === 'checkbox' ? (checked ? 200 : 0) : value,
     }));
   };
 
@@ -53,7 +54,7 @@ export default function ExpenseTracker() {
     setOpenConfirmDialog(false);
     const filledExpenses = Object.entries(expenses).reduce(
       (acc, [key, value]) => {
-        if (value !== "") {
+        if (value !== "" && value !== 0) {
           acc[key] = value;
         }
         return acc;
@@ -74,13 +75,11 @@ export default function ExpenseTracker() {
   };
 
   const sendToTelegram = async (expenses) => {
-    const botToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
+    const telegramToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
     const chatId = "-4209186125";
-    const telegramURL = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const telegramURL = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
-    const message = Object.entries(expenses)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join("\n");
+    const message = formatExpensesMessage(expenses);
 
     const response = await fetch(telegramURL, {
       method: "POST",
@@ -108,37 +107,39 @@ export default function ExpenseTracker() {
   const handleCloseDialog = () => {
     setOpenConfirmDialog(false);
   };
+
   const formatExpensesMessage = (expenses) => {
     const currentDate = new Date().toLocaleDateString('en-IN');
     let message = `Expense Report for ${currentDate}\n\n`;
-    
+
     for (const [key, value] of Object.entries(expenses)) {
-      if (value !== '') {
+      if (value !== '' && value !== 0) {
         message += `${key}: ₹${value}\n`;
       }
     }
-    
+
     return message;
   };
+
   return (
     <Container maxWidth="md">
       <Typography variant="h4" align="center" gutterBottom>
         दैनिक खर्च हिसाब 
       </Typography>
 
-      {/* Your expense input fields here */}
-      {/* For example: */}
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
           चाई सूट्टा 
         </Typography>
-        <TextField
-          fullWidth
-          label="Daily Expense"
-          name="dailyExpense"
-          value={expenses.dailyExpense}
-          disabled
-          margin="normal"
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={expenses.dailyExpense === 200} // Checkbox state
+              onChange={handleChange}
+              name="dailyExpense" // Name for Checkbox
+            />
+          }
+          label={expenses.dailyExpense === 200 ? "200 rs" : "0 rs"} // Display based on state
         />
       </Paper>
 
@@ -151,40 +152,48 @@ export default function ExpenseTracker() {
             <TextField
               fullWidth
               label="गैस का खर्च "
-              name="गैस का खर्च "
+              name="gasExpense" // Match name with state key
               value={expenses.gasExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="पेट्रोल का खर्च "
-              name="पेट्रोल का खर्च"
+              name="petrolExpense" // Match name with state key
               value={expenses.petrolExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="टोल टैक्स का खर्च "
-              name="टोल टैक्स का खर्च"
+              name="tollTaxExpense" // Match name with state key
               value={expenses.tollTaxExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="सर्विसिंग का खर्च "
-              name="सर्विसिंग का खर्च "
+              name="servicingExpense" // Match name with state key
               value={expenses.servicingExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
         </Grid>
@@ -199,30 +208,36 @@ export default function ExpenseTracker() {
             <TextField
               fullWidth
               label="पैकिंग का खर्च "
-              name="पैकिंग का खर्च"
+              name="packingExpense" // Match name with state key
               value={expenses.packingExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="स्टिकर एवं पन्नी का खर्च "
-              name="स्टिकर एवं पन्नी का खर्च "
+              name="stickerExpense" // Match name with state key
               value={expenses.stickerExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
               label="हम्मलि का खर्च "
-              name="हम्मलि का खर्च "
+              name="carryingExpense" // Match name with state key
               value={expenses.carryingExpense}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
         </Grid>
@@ -237,35 +252,40 @@ export default function ExpenseTracker() {
             <TextField
               fullWidth
               label="योगेन्द्र सिंह जी की सैलरी का खर्च "
-              name="योगेन्द्र सिंह जी की सैलरी का खर्च"
+              name="salaryYogendra" // Match name with state key
               value={expenses.salaryYogendra}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
               label="भारत गुर्जर जी की सैलरी का खर्च "
-              name="भारत गुर्जर जी की सैलरी का खर्च "
+              name="salaryBharat" // Match name with state key
               value={expenses.salaryBharat}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
-              label="मंगलम ने लिए"
-              name="मंगलम ने लिए"
+              label="राज्यवर्धन जी की सैलरी का खर्च "
+              name="salaryRajyavardhan" // Match name with state key
               value={expenses.salaryRajyavardhan}
               onChange={handleChange}
               margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
             />
           </Grid>
         </Grid>
       </Paper>
-      
 
       <Box
         sx={{
