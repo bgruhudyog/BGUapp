@@ -18,9 +18,15 @@ import {
 } from "@mui/material";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
+import supabaseClient from "../../utils/supabaseClient";
+const supabase = supabaseClient;
+
+
+
+
 export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState({
-    dailyExpense: 200, // Use number for expense value
+    dailyExpense: 200,
     gasExpense: "",
     petrolExpense: "",
     tollTaxExpense: "",
@@ -31,6 +37,8 @@ export default function ExpenseTracker() {
     salaryYogendra: "",
     salaryBharat: "",
     salaryRajyavardhan: "",
+    otherExpense: "",
+    otherExpenseDetails: "",
   });
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -64,11 +72,12 @@ export default function ExpenseTracker() {
 
     try {
       await sendToTelegram(filledExpenses);
-      setSnackbarMessage("Expenses sent to Telegram successfully!");
+      await sendToSupabase(filledExpenses);
+      setSnackbarMessage("Expenses sent to Telegram and Supabase successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
-      console.error("Error sending expenses to Telegram:", error);
-      setSnackbarMessage("Error sending expenses to Telegram");
+      console.error("Error sending expenses:", error);
+      setSnackbarMessage("Error sending expenses");
       setSnackbarSeverity("error");
     }
     setOpenSnackbar(true);
@@ -97,6 +106,28 @@ export default function ExpenseTracker() {
     }
   };
 
+  const sendToSupabase = async (expenses) => {
+    const { data, error } = await supabase
+      .from('Expense_Table')
+      .insert({
+        // created_at: new Date().toLocaleDateString('en-IN'),
+        gas_expense: expenses.gasExpense,
+        petrol_expense: expenses.petrolExpense,
+        toll_expense: expenses.tollTaxExpense,
+        servicing_expense: expenses.servicingExpense,
+        packing_expense: expenses.packingExpense,
+        stickerandpoly_expense: expenses.stickerExpense,
+        carrying_expense: expenses.carryingExpense,
+        yogendra_salary_expense: expenses.salaryYogendra,
+        bharat_salary_expense: expenses.salaryBharat,
+        raj_salary: expenses.salaryRajyavardhan,
+        other_expenses: expenses.otherExpense,
+        o_e_reason: expenses.otherExpenseDetails,
+      });
+
+    if (error) throw error;
+  };
+
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -111,15 +142,23 @@ export default function ExpenseTracker() {
   const formatExpensesMessage = (expenses) => {
     const currentDate = new Date().toLocaleDateString('en-IN');
     let message = `Expense Report for ${currentDate}\n\n`;
+    let total = 0;
 
     for (const [key, value] of Object.entries(expenses)) {
-      if (value !== '' && value !== 0) {
+      if (value !== '' && value !== 0 && key !== 'otherExpenseDetails') {
         message += `${key}: ₹${value}\n`;
+        total += Number(value);
       }
     }
 
+    if (expenses.otherExpenseDetails) {
+      message += `Other Expense Details: ${expenses.otherExpenseDetails}\n`;
+    }
+
+    message += `\nTotal Expense: ₹${total}`;
     return message;
   };
+
 
   return (
     <Container maxWidth="md">
@@ -127,7 +166,7 @@ export default function ExpenseTracker() {
         दैनिक खर्च हिसाब 
       </Typography>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           चाई सूट्टा 
         </Typography>
@@ -143,7 +182,7 @@ export default function ExpenseTracker() {
         />
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           गाड़ी सम्बंधित खर्च 
         </Typography>
@@ -199,7 +238,7 @@ export default function ExpenseTracker() {
         </Grid>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           मिर्ची संबंधित खर्च
         </Typography>
@@ -243,7 +282,7 @@ export default function ExpenseTracker() {
         </Grid>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           सैलरी का खर्च 
         </Typography>
@@ -282,6 +321,36 @@ export default function ExpenseTracker() {
               margin="normal"
               type="number"
               inputProps={{ min: 0 }}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          अन्य खर्च 
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="अन्य खर्च की राशि"
+              name="otherExpense"
+              value={expenses.otherExpense}
+              onChange={handleChange}
+              margin="normal"
+              type="number"
+              inputProps={{ min: 0 }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="अन्य खर्च का विवरण"
+              name="otherExpenseDetails"
+              value={expenses.otherExpenseDetails}
+              onChange={handleChange}
+              margin="normal"
             />
           </Grid>
         </Grid>
