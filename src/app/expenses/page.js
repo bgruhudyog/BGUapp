@@ -21,11 +21,8 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import supabaseClient from "../../utils/supabaseClient";
 const supabase = supabaseClient;
 
-
-
-
 export default function ExpenseTracker() {
-  const [expenses, setExpenses] = useState({
+  const initialExpenses = {
     dailyExpense: 200,
     gasExpense: "",
     petrolExpense: "",
@@ -39,7 +36,9 @@ export default function ExpenseTracker() {
     salaryRajyavardhan: "",
     otherExpense: "",
     otherExpenseDetails: "",
-  });
+  };
+
+  const [expenses, setExpenses] = useState(initialExpenses);
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -56,6 +55,10 @@ export default function ExpenseTracker() {
 
   const handleSubmit = () => {
     setOpenConfirmDialog(true);
+  };
+
+  const resetExpenses = () => {
+    setExpenses(initialExpenses);
   };
 
   const handleConfirmSubmit = async () => {
@@ -75,6 +78,7 @@ export default function ExpenseTracker() {
       await sendToSupabase(filledExpenses);
       setSnackbarMessage("Expenses sent to Telegram and Supabase successfully!");
       setSnackbarSeverity("success");
+      resetExpenses(); // Reset all field values after successful submission
     } catch (error) {
       console.error("Error sending expenses:", error);
       setSnackbarMessage("Error sending expenses");
@@ -110,7 +114,7 @@ export default function ExpenseTracker() {
     const { data, error } = await supabase
       .from('Expense_Table')
       .insert({
-        // created_at: new Date().toLocaleDateString('en-IN'),
+        chai_pani: expenses.dailyExpense, // New column for daily expense
         gas_expense: expenses.gasExpense,
         petrol_expense: expenses.petrolExpense,
         toll_expense: expenses.tollTaxExpense,
@@ -124,7 +128,7 @@ export default function ExpenseTracker() {
         other_expenses: expenses.otherExpense,
         o_e_reason: expenses.otherExpenseDetails,
       });
-
+  
     if (error) throw error;
   };
 
@@ -356,12 +360,17 @@ export default function ExpenseTracker() {
         </Grid>
       </Paper>
 
+  
+
       <Box
         sx={{
           position: "sticky",
           bottom: 16,
           textAlign: "center",
           zIndex: 1,
+          display: "flex",
+          justifyContent: "center",
+          gap: 2,
         }}
       >
         <Button
@@ -371,6 +380,17 @@ export default function ExpenseTracker() {
           onClick={handleSubmit}
         >
           Submit
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          onClick={() => {
+            // This is where you'll add the routing logic when the component is ready
+            console.log("View Expenses button clicked");
+          }}
+        >
+          View Expenses
         </Button>
       </Box>
 
@@ -407,7 +427,7 @@ export default function ExpenseTracker() {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={2000} // Changed to 5000ms (5 seconds)
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
