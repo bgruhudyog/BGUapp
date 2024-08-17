@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -22,6 +23,9 @@ import supabaseClient from "../../utils/supabaseClient";
 const supabase = supabaseClient;
 
 export default function ExpenseTracker() {
+  const router = useRouter();
+
+
   const initialExpenses = {
     dailyExpense: 200,
     gasExpense: "",
@@ -385,10 +389,7 @@ export default function ExpenseTracker() {
           variant="contained"
           color="secondary"
           size="large"
-          onClick={() => {
-            // This is where you'll add the routing logic when the component is ready
-            console.log("View Expenses button clicked");
-          }}
+          onClick={() => router.push('/allexpenses')}
         >
           View Expenses
         </Button>
