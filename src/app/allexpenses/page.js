@@ -119,7 +119,7 @@ export default function AllExpenses() {
   return (
     <Container maxWidth="lg">
       <Typography variant="h4" align="center" gutterBottom>
-        All Expenses
+       कुल हिसाब
       </Typography>
       <Box sx={{ mb: 2 }}>
         <Select
@@ -127,8 +127,8 @@ export default function AllExpenses() {
           onChange={(e) => setViewType(e.target.value)}
           sx={{ mr: 2 }}
         >
-          <MenuItem value="daily">Daily</MenuItem>
-          <MenuItem value="monthly">Monthly</MenuItem>
+          <MenuItem value="daily">दैनिक </MenuItem>
+          <MenuItem value="monthly">मासिक </MenuItem>
         </Select>
         {viewType === 'daily' && (
           <Select
@@ -145,16 +145,16 @@ export default function AllExpenses() {
         )}
       </Box>
 
-      <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+      <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
         <Typography variant="h6">
-          Total Expenses for {viewType === 'daily' ? formatDate(timeFrame) : 'Year'}: ₹{totalExpenses.toFixed(2)}
+           {viewType === 'daily' ? formatDate(timeFrame) : 'Year'}: ₹{totalExpenses.toFixed(2)} का कुल खर्च 
         </Typography>
       </Paper>
 
       <Grid container spacing={2}>
         {expenses.map((expenseItem, index) => (
           <Grid item xs={12} key={index}>
-            <Paper elevation={3} sx={{ p: 2 }}>
+            <Paper elevation={4} sx={{ p: 3, mb: 3,borderRadius: 3 }}>
               <Typography variant="h6">
                 {viewType === 'daily' 
                   ? `Date: ${expenseItem.date === 'Unknown Date' ? expenseItem.date : new Date(expenseItem.date).toLocaleDateString()}`
@@ -174,13 +174,13 @@ export default function AllExpenses() {
                 {expenseItem.otherExpenses.map((otherExpense, idx) => (
                   <Grid item xs={12} key={`other-${idx}`}>
                     <Typography>
-                      Other Expense: ₹{otherExpense.amount.toFixed(2)} - {otherExpense.reason}
+                    अन्य खर्च : ₹{otherExpense.amount.toFixed(2)} - {otherExpense.reason}
                     </Typography>
                   </Grid>
                 ))}
               </Grid>
               <Typography sx={{ mt: 1 }}>
-                <strong>Total: ₹{expenseItem.total.toFixed(2)}</strong>
+                <strong>कुल: ₹{expenseItem.total.toFixed(2)}</strong>
               </Typography>
               {viewType === 'daily' && expenseItem.date !== 'Unknown Date' && (
                 <Button 
@@ -189,7 +189,7 @@ export default function AllExpenses() {
                   sx={{ mt: 1 }}
                   onClick={() => handleDelete(expenseItem.date)}
                 >
-                  Delete This Day's Entries
+                  Delete करे 
                 </Button>
               )}
             </Paper>
