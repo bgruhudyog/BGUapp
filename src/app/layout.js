@@ -698,7 +698,7 @@ const drawerItems = [
     path: "/totalremaining",
   },
   { text: "दैनिक खर्च", icon: <CurrencyRupeeIcon />, path: "/expenses" },
-  { text: "हिसाब कुल", icon: <CurrencyRupeeIcon />, path: "/allexpenses"}
+  { text: "कुल हिसाब", icon: <CurrencyRupeeIcon />, path: "/allexpenses"}
 ];
 
 const DrawerComponent = ({ toggleDrawer, mode, toggleColorMode }) => (
