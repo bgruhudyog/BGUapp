@@ -564,7 +564,7 @@ export default function AllExpenses() {
                             </Grid>
                         </Grid>
                         <Button onClick={() => setShowPieChart(!showPieChart)} sx={{ mt: 2 }}>
-                            {showPieChart ? 'छुपाएँ' : 'दिखाएँ'} पाई चार्ट
+                             पाई चार्ट {showPieChart ? 'छुपाएँ' : 'दिखाएँ'}
                         </Button>
                         {showPieChart && (
     <Box sx={{ height: 300, width: '100%', mt: 2 }}>
