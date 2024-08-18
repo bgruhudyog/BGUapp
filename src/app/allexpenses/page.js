@@ -567,16 +567,19 @@ export default function AllExpenses() {
                             {showPieChart ? 'छुपाएँ' : 'दिखाएँ'} पाई चार्ट
                         </Button>
                         {showPieChart && (
-                            <Box sx={{ height: 300, width: '100%', mt: 2 }}>
-                                <PieChart
-                                    series={[
-                                        {
-                                            data: pieChartData,
-                                        },
-                                    ]}
-                                />
-                            </Box>
-                        )}
+    <Box sx={{ height: 300, width: '100%', mt: 2 }}>
+        <PieChart
+            series={[
+                {
+                    data: pieChartData,
+                    highlightScope: { faded: 'global', highlighted: 'item' },
+                    faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                },
+            ]}
+            height={200}
+        />
+    </Box>
+)}
                     </>
                 )}
             </Paper>
