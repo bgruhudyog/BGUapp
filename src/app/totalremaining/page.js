@@ -1,6 +1,6 @@
 
 
-// "use client";
+"use client";
 
 // import { useState, useEffect } from "react";
 // import {
@@ -238,9 +238,6 @@
 
 
 
-"use client";
-
-
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -268,6 +265,7 @@ export default function TotalRemainingPage() {
   const [shopData, setShopData] = useState([]);
   const [selectedRouteName, setSelectedRouteName] = useState("");
   const [totalRemaining, setTotalRemaining] = useState(0);
+  const [globalTotalRemaining, setGlobalTotalRemaining] = useState(0);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -279,6 +277,7 @@ export default function TotalRemainingPage() {
 
   useEffect(() => {
     fetchRoutes();
+    fetchAllShopsData();
   }, []);
 
   const fetchRoutes = async () => {
@@ -287,6 +286,20 @@ export default function TotalRemainingPage() {
       .select("*");
     if (error) console.error("Error fetching routes:", error);
     else setRoutes(data);
+  };
+
+  const fetchAllShopsData = async () => {
+    const { data, error } = await supabaseClient
+      .from("Shops Table")
+      .select("total, total_cash, total_old");
+
+    if (error) console.error("Error fetching all shops data:", error);
+    else {
+      const globalTotal = data.reduce((acc, shop) => {
+        return acc + calculateTotalRemaining(shop.total, shop.total_cash, shop.total_old);
+      }, 0);
+      setGlobalTotalRemaining(globalTotal);
+    }
   };
 
   const handleRouteChange = async (event) => {
@@ -322,7 +335,6 @@ export default function TotalRemainingPage() {
       });
       setShopData(sortedData);
 
-      // Calculate total remaining for all shops
       const total = sortedData.reduce((acc, shop) => {
         return acc + calculateTotalRemaining(shop.total, shop.total_cash, shop.total_old);
       }, 0);
@@ -340,9 +352,14 @@ export default function TotalRemainingPage() {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Typography variant="h6" gutterBottom align="center" sx={{ mb: 3 }}>
-        Total Remaining by Route
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Total Remaining by Route
+        </Typography>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          कुल उधारी (सभी दुकानें): ₹{globalTotalRemaining.toFixed(2)}
+        </Typography>
+      </Box>
       <Box mb={2} sx={{ mx: 2 }}>
         <Select
           value={selectedRouteId}
@@ -367,7 +384,7 @@ export default function TotalRemainingPage() {
       )}
       {shopData.length > 0 && (
         isMobile ? (
-          // Mobile view
+          // Mobile view (unchanged)
           shopData.map((shop) => {
             const totalRemaining = calculateTotalRemaining(
               shop.total,
@@ -407,7 +424,7 @@ export default function TotalRemainingPage() {
             );
           })
         ) : (
-          // Desktop view
+          // Desktop view (unchanged)
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
