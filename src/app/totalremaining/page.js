@@ -352,10 +352,10 @@ export default function TotalRemainingPage() {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pl:3 }}>
+        {/* <Typography variant="h6" gutterBottom>
           Total Remaining by Route
-        </Typography>
+        </Typography> */}
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
           कुल उधारी (सभी दुकानें): ₹{globalTotalRemaining.toFixed(2)}
         </Typography>
