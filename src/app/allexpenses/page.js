@@ -377,6 +377,10 @@ export default function AllExpenses() {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+ 
+    const getLastDayOfMonth = (year, month) => {
+        return new Date(year, month + 1, 0).getDate();
+    };
 
     useEffect(() => {
         fetchExpenses();
