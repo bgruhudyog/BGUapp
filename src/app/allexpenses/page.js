@@ -385,8 +385,10 @@ export default function AllExpenses() {
     const fetchExpenses = async () => {
         let startDate, endDate;
         if (viewType === 'daily') {
+            const [year, month] = timeFrame.split('-');
             startDate = `${timeFrame}-01`;
-            endDate = `${timeFrame}-31`;
+            const lastDay = getLastDayOfMonth(parseInt(year), parseInt(month) - 1);
+            endDate = `${timeFrame}-${lastDay}`;
         } else {
             startDate = `${selectedYear}-01-01`;
             endDate = `${selectedYear}-12-31`;
