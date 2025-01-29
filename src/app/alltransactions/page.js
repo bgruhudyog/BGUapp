@@ -36,7 +36,6 @@ const date = new Date().toLocaleDateString("en-IN", {
 
 export default function AllTransactions() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-
   const [transactions, setTransactions] = useState([]);
   const [totals, setTotals] = useState({
     quantity: 0,
@@ -53,8 +52,8 @@ export default function AllTransactions() {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
-    fetchTransactions(new Date());
-  }, []);
+    fetchTransactions(selectedDate);
+  }, [selectedDate]);
 
   const fetchTransactions = async (date = new Date()) => {
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -84,7 +83,6 @@ export default function AllTransactions() {
       .eq("created_at", formattedDate)
       .order("created_at", { ascending: false });
 
-    // ... rest of the function remains the same
     if (error) {
       console.error("Error fetching transactions:", error);
       setSnackbarMessage("Error fetching transactions. Please try again.");
@@ -282,8 +280,6 @@ export default function AllTransactions() {
   const reversedTransactions = [...transactions].reverse();
   return (
     <Container sx={{ mt: 4, mb: 6 }}>
-      {/* ... (keep all other JSX as it is) */}
-
       <Box
         sx={{
           display: "flex",
@@ -298,21 +294,10 @@ export default function AllTransactions() {
             value={selectedDate}
             onChange={handleDateChange}
             renderInput={(params) => <TextField {...params} />}
-            // minDate={
-            //   new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-            // }
             minDate={new Date(2024, 0, 1)}
             maxDate={new Date()}
           />
         </LocalizationProvider>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleFetchData}
-          sx={{ ml: 2 }}
-        >
-          हिसाब देखे
-        </Button>
       </Box>
 
       <Typography variant="h6" gutterBottom sx={{ textAlign: "center" }}>

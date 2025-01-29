@@ -47,6 +47,11 @@ export default function TotalRemainingPage() {
     // Remove decimal and format with commas (Indian number system)
     return Math.floor(number).toLocaleString("en-IN");
   };
+
+  const toggleRow = (id) => {
+    setExpandedRow(expandedRow === id ? null : id);
+  };
+
   useEffect(() => {
     fetchRoutes();
     fetchAllShopsData();
@@ -246,9 +251,12 @@ UPI के माध्यम से भुगतान कर देवें�
             borderColor: totalRemaining === 0 ? "green" : "red",
             borderWidth: 2,
             borderStyle: "solid",
+            overflow: "hidden", // Add this to contain the Collapse
           }}
         >
-          <CardContent>
+          <CardContent sx={{ pb: 1 }}>
+            {" "}
+            {/* Reduce bottom padding */}
             <Typography variant="subtitle1">{shop.shop_name}</Typography>
             <Typography variant="caption">{shop.village_name}</Typography>
             <Box
@@ -275,28 +283,42 @@ UPI के माध्यम से भुगतान कर देवें�
                 )}
               </Box>
             </Box>
-            <IconButton onClick={() => toggleRow(shop.id)} size="small">
-              {expandedRow === shop.id ? (
-                <ExpandLessIcon />
-              ) : (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+              <IconButton
+                onClick={() => toggleRow(shop.id)}
+                size="small"
+                sx={{
+                  transform:
+                    expandedRow === shop.id ? "rotate(180deg)" : "none",
+                  transition: "transform 0.3s",
+                }}
+              >
                 <ExpandMoreIcon />
-              )}
-            </IconButton>
+              </IconButton>
+            </Box>
           </CardContent>
-          <Collapse in={expandedRow === shop.id}>
+          <Collapse
+            in={expandedRow === shop.id}
+            sx={{
+              width: "100%",
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
             <CardContent>
-              <Typography variant="body2">
-                कुल माल लिया: {formatNumber(shop.total_quantity || 0)} Kg
-              </Typography>
-              <Typography variant="body2">
-                कुल बिक्री मूल्य: ₹{formatNumber(shop.total || 0)}
-              </Typography>
-              <Typography variant="body2">
-                नदगी: ₹{formatNumber(shop.total_cash || 0)}
-              </Typography>
-              <Typography variant="body2">
-                उधारी जमा: ₹{formatNumber(shop.total_old || 0)}
-              </Typography>
+              <Box sx={{ px: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  कुल माल लिया: {formatNumber(shop.total_quantity || 0)} Kg
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  कुल बिक्री मूल्य: ₹{formatNumber(shop.total || 0)}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  नदगी: ₹{formatNumber(shop.total_cash || 0)}
+                </Typography>
+                <Typography variant="body2">
+                  उधारी जमा: ₹{formatNumber(shop.total_old || 0)}
+                </Typography>
+              </Box>
             </CardContent>
           </Collapse>
         </Card>
