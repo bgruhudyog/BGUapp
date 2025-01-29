@@ -138,3 +138,18 @@ h2 {
   height: 100%; /* Adjust as needed */
 }
 
+.calculator {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  text-align: right;
+  border-radius: 4px;
+  outline: none;
+}
