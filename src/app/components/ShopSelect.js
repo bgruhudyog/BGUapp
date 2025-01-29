@@ -43,7 +43,7 @@ export default function ShopSelect({
   }, [villageId, routeId]);
 
   const fetchShops = async () => {
-    console.log("fetch shops called")
+    console.log("fetch shops called");
     const { data, error } = await supabaseClient
       .from("Shops Table")
       .select("*")
@@ -210,8 +210,6 @@ export default function ShopSelect({
     setNewShopName(capitalizedValue);
   };
   const handleShopSelect = async (event, newValue) => {
-
-    
     if (newValue) {
       setSelectedShopId(newValue.id);
       setSelectedShopName(newValue.shop_name);
@@ -219,10 +217,10 @@ export default function ShopSelect({
       const result = calculateShopResult(newValue);
       console.log("Initial calculated result:", result);
       setCalculatedResult(result);
-  
+
       // Store the original mobile number
       setOriginalMobileNumber(newValue.mob_number);
-  
+
       if (newValue.mob_number === null) {
         setShowMobileInput(true);
         setMobileNumber(null);
@@ -236,7 +234,7 @@ export default function ShopSelect({
           top: document.documentElement.scrollHeight,
           behavior: "smooth",
         });
-     
+
         setTimeout(() => {
           if (newValue.mob_number === null && mobileInputRef.current) {
             mobileInputRef.current.focus();
@@ -246,7 +244,6 @@ export default function ShopSelect({
         }, 100);
       }, 100);
     } else {
-
     }
   };
 
@@ -356,6 +353,7 @@ export default function ShopSelect({
 
       {showTransactionForm && (
         <TransactionForm
+          calculatedResult={calculatedResult}
           shopId={selectedShopId}
           villageName={villageName}
           routeId={routeId}
@@ -375,7 +373,7 @@ export default function ShopSelect({
           setMobileNumber={setMobileNumber}
           mobileNumber={mobileNumber}
           originalMobileNumber={originalMobileNumber}
-          quantityInputRef={quantityInputRef} 
+          quantityInputRef={quantityInputRef}
         />
       )}
     </Box>

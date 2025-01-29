@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 
 export default function TransactionForm({
+  calculatedResult,
   shopId,
   villageName,
   routeId,
@@ -37,7 +38,7 @@ export default function TransactionForm({
   setMobileNumber,
   mobileNumber,
   originalMobileNumber,
-  quantityInputRef
+  quantityInputRef,
 }) {
   const [isRateFocused, setIsRateFocused] = useState(false);
   const [isCashFocused, setIsCashFocused] = useState(false);
@@ -48,9 +49,12 @@ export default function TransactionForm({
   const rateValue = parseFloat(rate) || 230;
   const cashValue = parseFloat(cash) || 0;
   const oldValue = parseFloat(old) || 0;
-
   const totalValue = quantityValue * rateValue;
   const remainingValue = totalValue - cashValue;
+  const isOldDisabled = parseFloat(calculatedResult) === 0;
+  const totalUdhari = (parseFloat(calculatedResult) || 0) + remainingValue;
+  
+  
 
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -160,8 +164,6 @@ export default function TransactionForm({
     }
   }
 
-  
-
   const handleTelegramSubmit = async () => {
     try {
       console.log("handleTelegramSubmit function called");
@@ -169,15 +171,15 @@ export default function TransactionForm({
       const telegramToken = "7240758563:AAHc_bUtGSBHWNPRAXuNxSZ4c4zEWH6Lcz0";
       const chatId = "-4209186125";
       const telegramURL = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
-  
+
       const currentDate = new Date();
       const year = currentDate.getFullYear();
       const month = String(currentDate.getMonth() + 1).padStart(2, "0");
       const day = String(currentDate.getDate()).padStart(2, "0");
-  
+
       const formattedDateForSupaBase = `${year}-${month}-${day}`;
       const formattedDateForTelegram = `${day}/${month}/${year}`;
-  
+
       console.log("Preparing to insert data into Supabase");
       const transactionData = {
         created_at: formattedDateForSupaBase,
@@ -192,32 +194,33 @@ export default function TransactionForm({
         shop_id: shopId,
       };
       console.log("Data to be inserted:", transactionData);
-  
+
       const { data, error } = await insertTransaction(transactionData);
       if (error) {
         throw new Error(`Failed to insert transaction: ${error.message}`);
       }
-  
+
       // Fetch current shop data
       const { data: shopData, error: fetchError } = await supabase
         .from("Shops Table")
         .select("*")
         .eq("id", shopId)
         .single();
-  
+
       if (fetchError) {
         throw new Error(`Failed to fetch shop data: ${fetchError.message}`);
       }
-  
+
       // Calculate new totals
-      const newTotalQuantity = (shopData.total_quantity || 0) + (parseFloat(quantity) || 0);
+      const newTotalQuantity =
+        (shopData.total_quantity || 0) + (parseFloat(quantity) || 0);
       const newTotal = (shopData.total || 0) + totalValue;
       const newTotalCash = (shopData.total_cash || 0) + cashValue;
       const newTotalOld = (shopData.total_old || 0) + oldValue;
-  
+
       // Use originalMobileNumber if mobileNumber is null
       const mobileNumberToUse = mobileNumber || originalMobileNumber;
-  
+
       // Update Shops Table
       const { data: updateData, error: updateError } = await supabase
         .from("Shops Table")
@@ -231,35 +234,37 @@ export default function TransactionForm({
           mob_number: mobileNumberToUse,
         })
         .eq("id", shopId);
-  
+
       if (updateError) {
         throw new Error(`Failed to update shop totals: ${updateError.message}`);
       }
-  
+
       let message;
       if (totalValue === 0) {
         message = `
-  दिनांक: ${formattedDateForTelegram}\n
-  रूट: ${routeId}\n
-  दुकान का नाम: ${shopName}, ${villageName}\n
-  पुराने जमा: ₹${oldValue.toFixed(2)}\n
-        `;
+दिनांक: ${formattedDateForTelegram}\n
+रूट: ${routeId}\n
+दुकान का नाम: ${shopName}, ${villageName}\n
+पुराने जमा: ₹${oldValue.toFixed(2)}\n
+कुल उधारी: ₹${totalUdhari.toFixed(2)}
+    `;
       } else {
         message = `
-  दिनांक: ${formattedDateForTelegram}\n
-  रूट: ${routeId}\n
-  दुकान का नाम: ${shopName}, ${villageName}\n
-  मात्रा: ${quantity} Kg\n
-  रेट: ₹${rateValue}\n
-  कुल: ₹${totalValue.toFixed(2)}\n
-  नगदी: ₹${cash}\n
-  आज के बाक़ी: ₹${remainingValue.toFixed(2)}\n
-  पुराने जमा: ₹${oldValue.toFixed(2)}\n
-            `;
+दिनांक: ${formattedDateForTelegram}\n
+रूट: ${routeId}\n
+दुकान का नाम: ${shopName}, ${villageName}\n
+मात्रा: ${quantity} Kg\n
+रेट: ₹${rateValue}\n
+कुल: ₹${totalValue.toFixed(2)}\n
+नगदी: ₹${cash}\n
+आज के बाक़ी: ₹${remainingValue.toFixed(2)}\n
+पुराने जमा: ₹${oldValue.toFixed(2)}\n
+कुल उधारी: ₹${totalUdhari.toFixed(2)}
+    `;
       }
-  
+
       console.log("Sending message to Telegram");
-  
+
       // Send message to Telegram
       const response = await fetch(telegramURL, {
         method: "POST",
@@ -270,21 +275,21 @@ export default function TransactionForm({
         }),
         headers: { "Content-Type": "application/json" },
       });
-  
+
       if (!response.ok) {
         throw new Error("Telegram API response was not ok.");
       }
-  
+
       console.log("Message sent to Telegram successfully");
       setSnackbarMessage("हिसाब सफलतापूर्वक जमा किया गया!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
-  
+
       if (onTransactionComplete) {
         console.log("Calling onTransactionComplete");
         onTransactionComplete();
       }
-  
+
       setTimeout(() => {
         resetForm();
       }, 1000);
@@ -316,7 +321,7 @@ export default function TransactionForm({
           margin="normal"
           inputRef={quantityInputRef} // Add this line
         />
-        
+
         <TextField
           id="rate"
           label="रेट"
@@ -357,6 +362,7 @@ export default function TransactionForm({
           onBlur={() => setIsOldFocused(false)}
           fullWidth
           margin="normal"
+          disabled={isOldDisabled} // Add this line
         />
       </Box>
       <Box mt={2} display="flex" justifyContent="space-between">
@@ -420,6 +426,8 @@ export default function TransactionForm({
                 आज के बाक़ी: ₹{remainingValue.toFixed(2)}
                 <br />
                 पुराने जमा: ₹{oldValue.toFixed(2)}
+                <br />
+                कुल उधारी: ₹{totalUdhari.toFixed(2)}
               </>
             )}
           </DialogContentText>
