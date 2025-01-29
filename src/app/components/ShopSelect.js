@@ -236,14 +236,7 @@ export default function ShopSelect({
           top: document.documentElement.scrollHeight,
           behavior: "smooth",
         });
-      // setTimeout(() => {
-      //   const scrollAmount = 50; // Adjust this value to control how much it scrolls
-      //   window.scrollTo({
-      //     top: window.scrollY + scrollAmount,
-      //     behavior: "smooth",
-      //   });
-
-        // Focus on the appropriate input field after scrolling
+     
         setTimeout(() => {
           if (newValue.mob_number === null && mobileInputRef.current) {
             mobileInputRef.current.focus();
@@ -253,7 +246,7 @@ export default function ShopSelect({
         }, 100);
       }, 100);
     } else {
-      // ... (rest of the else block remains unchanged)
+
     }
   };
 
@@ -382,7 +375,7 @@ export default function ShopSelect({
           setMobileNumber={setMobileNumber}
           mobileNumber={mobileNumber}
           originalMobileNumber={originalMobileNumber}
-          quantityInputRef={quantityInputRef} // Add this line
+          quantityInputRef={quantityInputRef} 
         />
       )}
     </Box>
