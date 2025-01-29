@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
 import MessageIcon from "@mui/icons-material/Message";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp"; // Added WhatsApp icon
 import supabaseClient from "../../utils/supabaseClient";
 import {
   useMediaQuery,
@@ -43,10 +42,6 @@ export default function TotalRemainingPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [expandedRow, setExpandedRow] = useState(null);
 
-  const formatNumber = (number) => {
-    // Remove decimal and format with commas (Indian number system)
-    return Math.floor(number).toLocaleString("en-IN");
-  };
   useEffect(() => {
     fetchRoutes();
     fetchAllShopsData();
@@ -137,14 +132,14 @@ export default function TotalRemainingPage() {
     const lastMessageTime = messageTimestamps[shopId];
     if (!lastMessageTime) return false;
 
-    const threeHoursInMs = 3 * 60 * 60 * 1000;
-    return Date.now() - lastMessageTime < threeHoursInMs;
+    const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+    return Date.now() - lastMessageTime < twoDaysInMs;
   };
 
   const handleMessage = (phoneNumber, totalRemaining) => {
     const message = `माननीय विक्रेता,
 आपको सूचित किया जाता है की आपके कुल 
-${formatNumber(totalRemaining)}₹ शेष है ।
+${totalRemaining.toFixed(2)}₹ शेष है ।
 निवेदन है कि आप नीचे दिए हुए नम्बर पर 
 UPI के माध्यम से भुगतान कर देवें।
 धन्यवाद।
@@ -153,6 +148,7 @@ UPI के माध्यम से भुगतान कर देवें�
 योगेन्द्र सिंह झाला,
 भाटपचलाना ।`;
 
+    // Save timestamp to state and localStorage
     const newTimestamps = {
       ...messageTimestamps,
       [phoneNumber]: Date.now(),
@@ -160,76 +156,41 @@ UPI के माध्यम से भुगतान कर देवें�
     setMessageTimestamps(newTimestamps);
     localStorage.setItem("messageTimestamps", JSON.stringify(newTimestamps));
 
+    // Open default SMS app with pre-filled message
     window.open(
       `sms:${phoneNumber}?body=${encodeURIComponent(message)}`,
       "_self"
     );
   };
 
-  const handleWhatsApp = (phoneNumber, totalRemaining) => {
-    const message = `माननीय विक्रेता,
-आपको सूचित किया जाता है की आपके कुल 
-${formatNumber(totalRemaining)}₹ शेष है ।
-निवेदन है कि आप नीचे दिए हुए नम्बर पर 
-UPI के माध्यम से भुगतान कर देवें।
-धन्यवाद।
-बालाजी गृह उद्योग 
-9340231021
-योगेन्द्र सिंह झाला,
-भाटपचलाना ।`;
-
-    // Convert phoneNumber to string and remove any non-digit characters
-    const formattedPhone = String(phoneNumber).replace(/\D/g, "");
-    const whatsappNumber = formattedPhone.startsWith("91")
-      ? formattedPhone
-      : `91${formattedPhone}`;
-
-    // Open WhatsApp with pre-filled message
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-  };
-
-  const renderMessageButtons = (shop, totalRemaining) => {
+  const renderMessageButton = (shop, totalRemaining) => {
     if (!shop.mob_number) return null;
 
     const disabled = isMessageDisabled(shop.mob_number);
 
     return (
-      <Box>
-        <Tooltip
-          title={
-            disabled
-              ? "Wait 3 hours before sending another message"
-              : "Send SMS reminder"
-          }
-        >
-          <span>
-            <IconButton
-              color="primary"
-              onClick={() => handleMessage(shop.mob_number, totalRemaining)}
-              disabled={disabled}
-              aria-label={`Message ${shop.shop_name}`}
-            >
-              <MessageIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title="Send WhatsApp message">
+      <Tooltip
+        title={
+          disabled
+            ? "Wait 2 days before sending another message"
+            : "Send payment reminder"
+        }
+      >
+        <span>
           <IconButton
-            color="success"
-            onClick={() => handleWhatsApp(shop.mob_number, totalRemaining)}
-            aria-label={`WhatsApp ${shop.shop_name}`}
+            color="primary"
+            onClick={() => handleMessage(shop.mob_number, totalRemaining)}
+            disabled={disabled}
+            aria-label={`Message ${shop.shop_name}`}
           >
-            <WhatsAppIcon />
+            <MessageIcon />
           </IconButton>
-        </Tooltip>
-      </Box>
+        </span>
+      </Tooltip>
     );
   };
 
-  // Update the display of numbers in mobile view
+  // Modified mobile view to include message button
   const renderMobileView = () =>
     shopData.map((shop) => {
       const totalRemaining = calculateTotalRemaining(
@@ -259,10 +220,10 @@ UPI के माध्यम से भुगतान कर देवें�
               }}
             >
               <Typography variant="body2">
-                कुल उधारी: ₹{formatNumber(totalRemaining)}
+                कुल उधारी: ₹{totalRemaining.toFixed(2)}
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                {renderMessageButtons(shop, totalRemaining)}
+              <Box>
+                {renderMessageButton(shop, totalRemaining)}
                 {shop.mob_number && (
                   <IconButton
                     color="primary"
@@ -285,16 +246,16 @@ UPI के माध्यम से भुगतान कर देवें�
           <Collapse in={expandedRow === shop.id}>
             <CardContent>
               <Typography variant="body2">
-                कुल माल लिया: {formatNumber(shop.total_quantity || 0)} Kg
+                कुल माल लिया: {shop.total_quantity?.toFixed(2) || "0.00"} Kg
               </Typography>
               <Typography variant="body2">
-                कुल बिक्री मूल्य: ₹{formatNumber(shop.total || 0)}
+                कुल बिक्री मूल्य: ₹{shop.total?.toFixed(2) || "0.00"}
               </Typography>
               <Typography variant="body2">
-                नदगी: ₹{formatNumber(shop.total_cash || 0)}
+                नदगी: ₹{shop.total_cash?.toFixed(2) || "0.00"}
               </Typography>
               <Typography variant="body2">
-                उधारी जमा: ₹{formatNumber(shop.total_old || 0)}
+                उधारी जमा: ₹{shop.total_old?.toFixed(2) || "0.00"}
               </Typography>
             </CardContent>
           </Collapse>
@@ -302,7 +263,7 @@ UPI के माध्यम से भुगतान कर देवें�
       );
     });
 
-  // Update the display of numbers in desktop view
+  // Modified desktop view to include message button
   const renderDesktopView = () => (
     <TableContainer component={Paper}>
       <Table>
@@ -346,10 +307,10 @@ UPI के माध्यम से भुगतान कर देवें�
                   <Typography variant="caption">{shop.village_name}</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  ₹{formatNumber(totalRemaining)}
+                  ₹{totalRemaining.toFixed(2)}
                 </TableCell>
                 <TableCell align="right">
-                  {renderMessageButtons(shop, totalRemaining)}
+                  {renderMessageButton(shop, totalRemaining)}
                 </TableCell>
                 <TableCell align="right">
                   {shop.mob_number && (
@@ -363,16 +324,16 @@ UPI के माध्यम से भुगतान कर देवें�
                   )}
                 </TableCell>
                 <TableCell align="right">
-                  {formatNumber(shop.total_quantity || 0)} Kg
+                  {shop.total_quantity?.toFixed(2) || "0.00"} Kg
                 </TableCell>
                 <TableCell align="right">
-                  ₹{formatNumber(shop.total || 0)}
+                  ₹{shop.total?.toFixed(2) || "0.00"}
                 </TableCell>
                 <TableCell align="right">
-                  ₹{formatNumber(shop.total_cash || 0)}
+                  ₹{shop.total_cash?.toFixed(2) || "0.00"}
                 </TableCell>
                 <TableCell align="right">
-                  ₹{formatNumber(shop.total_old || 0)}
+                  ₹{shop.total_old?.toFixed(2) || "0.00"}
                 </TableCell>
               </TableRow>
             );
@@ -394,7 +355,7 @@ UPI के माध्यम से भुगतान कर देवें�
         }}
       >
         <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-          कुल उधारी (सभी दुकानें): ₹{formatNumber(globalTotalRemaining)}
+          कुल उधारी (सभी दुकानें): ₹{globalTotalRemaining.toFixed(2)}
         </Typography>
       </Box>
       <Box mb={2} sx={{ mx: 2 }}>
