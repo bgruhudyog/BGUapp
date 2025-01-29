@@ -335,7 +335,7 @@ const DrawerComponent = ({ toggleDrawer, mode, toggleColorMode }) => (
     <Divider />
     <Box sx={{ p: 2, textAlign: "center" }}>
       <Typography variant="body2" color="text.secondary">
-        © 2024 Balaji Gruh Udyog
+        © {new Date().getFullYear()} Balaji Gruh Udyog
       </Typography>
     </Box>
   </StyledDrawer>
